@@ -11,10 +11,10 @@ def derive_key_and_iv(password, salt, key_length, iv_length):
 
 def encrypt(in_file, out_file, password, key_length=32):
     bs = AES.block_size
-    salt = Random.new().read(bs - len('Salted__'))
+    salt = Random.new().read(bs - len('WTF__'))
     key, iv = derive_key_and_iv(password, salt, key_length, bs)
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    out_file.write('Salted__' + salt)
+    out_file.write('WTF__' + salt)
     finished = False
     while not finished:
         chunk = in_file.read(1024 * bs)
@@ -26,7 +26,7 @@ def encrypt(in_file, out_file, password, key_length=32):
 
 def decrypt(in_file, out_file, password, key_length=32):
     bs = AES.block_size
-    salt = in_file.read(bs)[len('Salted__'):]
+    salt = in_file.read(bs)[len('WTF__'):]
     key, iv = derive_key_and_iv(password, salt, key_length, bs)
     cipher = AES.new(key, AES.MODE_CBC, iv)
     next_chunk = ''
@@ -38,8 +38,13 @@ def decrypt(in_file, out_file, password, key_length=32):
             chunk = chunk[:-padding_length]
             finished = True
         out_file.write(chunk)
-        
-with open(in_filename, 'rb') as in_file, open(out_filename, 'wb') as out_file:
+
+original_file = ".pdf"
+encrypted_file = "encrypted.txt"
+decrypted_file = "decrypted.txt"
+password = ""
+
+with open(original_file, 'rb') as in_file, open(encrypted_file, 'wb') as out_file:
     encrypt(in_file, out_file, password)
-with open(in_filename, 'rb') as in_file, open(out_filename, 'wb') as out_file:
+with open(encrypted_file, 'rb') as in_file, open(decrypted_file, 'wb') as out_file:
     decrypt(in_file, out_file, password)
